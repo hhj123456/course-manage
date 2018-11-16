@@ -10,37 +10,22 @@
 			<span style="float: right;font-size: 14px">更多></span>
 		</div>
 		<div>
-			<div class="excontent">
-        <router-link to="/detial/123">
+			<div class="excontent" v-for="item in data">
+        <router-link :to="/detial/+item.id">
 				<a href="">
 					<el-col :span="6">
-						<div class="excontent_left"><img src="@/assets/ex.jpg"></div>
+						<div class="excontent_left"><img :src="imgsrc+item.image"></div>
 					</el-col>
   					<el-col :span="18">
   						<div class="excontent_right">
-  							<h4>计算机维修技术</h4>
-  							<p class="sub-text">江苏大学 计算机学院 马汉达</p>
-  							<P class="caption-brief">计算机维修技术是一门技术性、实践性很强的课程，通过学习掌握计算机部件的性能及其选购方法，掌握如何根据需求配置合适的机器，掌握计算机组装方法及系统维护方法、故障诊断处理方法。</P>
-  							<p class="sub-text">目前有56个实验</p>
+  							<h4>{{item.coname}}</h4>
+  							<p class="sub-text">江苏大学 {{item.tcollege}} {{item.tname}}</p>
+  							<P class="caption-brief">{{item.cinfo}}</P>
+  							<p class="sub-text">创建时间：{{item.createtime}}</p>
   						</div>
   					</el-col>
 					</a>
           </router-link>
-			</div>
-			<div class="excontent">
-				<a href="">
-					<el-col :span="6">
-						<div class="excontent_left"><img src="@/assets/ex.jpg"></div>
-					</el-col>
-  					<el-col :span="18">
-  						<div class="excontent_right">
-  							<h4>计算机维修技术</h4>
-  							<p class="sub-text">江苏大学 计算机学院 马汉达</p>
-  							<P class="caption-brief">计算机维修技术是一门技术性、实践性很强的课程，通过学习掌握计算机部件的性能及其选购方法，掌握如何根据需求配置合适的机器，掌握计算机组装方法及系统维护方法、故障诊断处理方法。</P>
-  							<p class="sub-text">目前有56个实验</p>
-  						</div>
-  					</el-col>
-					</a>
 			</div>
 		</div>
 		<div class="morecourse">
@@ -54,7 +39,7 @@
 <script type="text/javascript">
   import exfooter from '../footer/footer.vue';
   import exheader from '../header/header.vue';
-  import { requestLogin } from '@/api/api';
+  import { requestLogin,getCourse,baseImge} from '@/api/api';
 	export default {
 		name:"hoem",
     	components:{
@@ -63,9 +48,22 @@
 	    },
 		data(){
 			return {
-				src:[require("@/assets/5.jpg"),require("@/assets/3.jpg"),require("@/assets/7.jpg")]
+				src:[require("@/assets/5.jpg"),require("@/assets/3.jpg"),require("@/assets/7.jpg")],
+        data:[],
+        imgsrc:baseImge,
 			}
-		}
+		},
+    methods:{
+      getCourseInfo(){
+        getCourse().then(res => {
+          this.data = res.data.data;
+        })
+      }
+    },
+    mounted(){
+      this.getCourseInfo();
+    }
+
 	}
 </script>
 <style scoped>
