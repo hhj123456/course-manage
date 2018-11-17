@@ -92,6 +92,7 @@
 	</div>
 </template>
 <script>
+	import {getStuQuestion} from '@/api/api';
 	export default{
 		name :"excontent",
 		data(){
@@ -110,6 +111,9 @@
 				endstamp:'',//签退时间戳
 				stopflag:false,//计时器停止
 				content:[],//文档内容
+				singleCount:0,//单选题分数
+				multiCount:0,//多选题分数
+				questions:[],//测试题
 			}
 		},
 		methods:{
@@ -176,11 +180,22 @@
 				timeDiff = timeDiff % 60;
 				var second = timeDiff;
 				return [hour,minute,second];
+			},
+			//获取测试题
+			getTestQuesetion(){
+				let param = {
+					stuid : 1,
+					exid : this.$route.params.id
+				}
+				getStuQuestion(param).then(res => {
+					console.log(res.data.data);
+				});
 			}
 		},
 		mounted(){
 			this.timer=setInterval(this.updateTime,1000);
 			this.updateTime();
+			this.getTestQuesetion();
 		}
 	}
 </script>

@@ -28,3 +28,29 @@ export const getCourse = params => {
       	}
     ); 
 };
+
+//获取实验章节
+export const getChpaterExcement = params => { 
+	return axios.post(
+		`${base}/Addchapter/select`,
+		Qs.stringify(params),
+		{
+	        headers: {
+	          'Content-Type': 'application/x-www-form-urlencoded'
+	        }
+      	}
+    ); 
+};
+
+//获取测试题
+export const getStuQuestion = params => { 
+	return axios.post(
+		`${base}/StuQues/index`,
+		Qs.stringify(params),
+		{
+	        headers: {
+	          'Content-Type': 'application/x-www-form-urlencoded'
+	        }
+      	}
+    ); 
+};

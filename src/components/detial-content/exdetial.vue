@@ -33,10 +33,10 @@
 			    	<p>江苏大学 计算机学院</p>
 			    </el-tab-pane>
 			    <el-tab-pane label="实验章节" name="second">
-			    	<div class="excontent" v-for="(item,index) in 5">
+			    	<div class="excontent" v-for="(item,index) in data">
 				    	<div class="exchapter" @click.stop.prevent="expand(index)">
 				    		<div class="exchapter_left">
-				    			第{{item}}章 微型计算机概述
+				    			{{item.caname}}
 				    		</div>
 				    		<div class="exchapter_right">
 				    			<i class="el-icon-arrow-down" v-show="expandindex[index]"></i>
@@ -45,12 +45,14 @@
 				    	</div>
 				    	<el-collapse-transition>
 					    	<div v-show="!expandindex[index]">
-						    	<div v-for="items in index">
+						    	<div v-for="(item1,index1) in item.experimentinfo">
 						    		<div style="height: 5px"></div>
-						    		<router-link to="/course/123/12">
+						    		<router-link :to="/course/+item1.id">
 						    		<div class="exsection">
-							    		<span class="exsection_left">{{item}}.{{items}}计算机发展概述</span>
-							    		<span class="exsection_right">已完成</span>
+							    		<span class="exsection_left">{{index+1}}.{{index1+1}}  {{item1.ename}}</span>
+							    		<span class="exsection_right" :class="item1.isclass == 0 ? info : danger ">
+							    			{{item1.isclass == 0 ? '未开始':'已开始'}}
+							    		</span>
 						    		</div>
 						    		</router-link>
 						    		<div style="height: 5px"></div>
@@ -65,12 +67,16 @@
 	</div>
 </template>
 <script>
+	import {getChpaterExcement} from '@/api/api';
 	export default{
 		name : 'exdetial',
 		data(){
 			return {
 				activeName:'second',
-				expandindex:[]
+				expandindex:[],
+				data:[],
+				danger:'danger',
+				info:'info'
 			}
 		},
 		methods:{
@@ -80,7 +86,20 @@
 		    expand(index){
 		    	this.expandindex[index] = !this.expandindex[index];
             	this.$set(this.expandindex,index,this.expandindex[index])
+		    },
+		    getChapers(){
+		    	let params ={
+		    		coid : this.$route.params.num
+		    	}
+		    	getChpaterExcement(params).then(res => {
+		    		// console.log(res.data.data);
+		    		this.data = res.data.data;
+		    	});
+		    	// console.log(this.$route.params.num);
 		    }
+		},
+		mounted(){
+			this.getChapers();
 		}
 	}
 </script>
@@ -179,6 +198,12 @@
 		background-color: #333;
 		color: #fff;
 		cursor: pointer;
+	}
+	.danger{
+		color: #F56C6C;
+	}
+	.info{
+		color: #909399;
 	}
 </style>
 <style type="text/css">

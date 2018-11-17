@@ -28,7 +28,7 @@ const routes = [
     	children:[
     		{path: 'home', component: Home, name: '',meta:{title:"首页"}},
     		{path: 'detial/:num', component: ExDetial, name: '实验课程' ,meta:{title:"实验课程"}},
-            {path: 'course/:num/:id', component: ExContent, name: '开始试验' ,meta:{title:"开始试验"}}
+            {path: 'course/:id', component: ExContent, name: '开始试验' ,meta:{title:"开始试验"}}
     	]
     }
 ]
