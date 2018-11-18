@@ -54,3 +54,29 @@ export const getStuQuestion = params => {
       	}
     ); 
 };
+
+//获取实验中的内容
+export const getExperimentContent = params => { 
+    return axios.post(
+        `${base}/Addexreport/search`,
+        Qs.stringify(params),
+        {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ); 
+};
+
+//获取实验与总结中的主观题
+export const getExperimentConclusion = params => { 
+    return axios.post(
+        `${base}/Exconclusion/search`,
+        Qs.stringify(params),
+        {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ); 
+};

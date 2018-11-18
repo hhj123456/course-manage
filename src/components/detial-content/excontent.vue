@@ -1,20 +1,49 @@
 <template>
 	<div class="excontent">
-		<el-tabs type="border-card"  v-model="activeName">
+		<el-tabs type="border-card"  v-model="activeName" v-loading="testLoading">
 		  <el-tab-pane name="first">
 		    <span slot="label"><i class="el-icon-document"></i> 预习测试</span>
-		    <div v-for="(item,index) in 3">
+		    <div v-if="questions.length > 0">
+		    <div v-for="(item,index) in questions">
 		    	<div class="test-header">
-		    		{{item}}.<span style="color: red">[单选题]</span> 用于加亮文本代标签是
+		    		{{index+1}}. 
+		    		<span style="color: red"> 
+		    			[{{item.type == 0 ? '单选题' : '多选题'}}]
+		    			{{item.type == 0 ? singleCount : multiCount}}分
+		    		</span> 
+		    		{{item.topic}}
 		    	</div>
-		    	<div class="test-select">
-		    		<el-radio v-model="radio[index]" label="1" border>备选项1</el-radio>
-    				<el-radio v-model="radio[index]" label="2" border>备选项2</el-radio>
-    				<el-radio v-model="radio[index]" label="3" border>备选项2</el-radio>
-    				<el-radio v-model="radio[index]" label="4" border>备选项2</el-radio>
+		    	<div class="test-select" v-if = "item.type == 0">
+		    		<el-radio-group v-model="stuselect[index].select">
+					    <el-radio 
+					    	:label="index1" 
+					    	:key="index1" 
+					    	v-for="(anser,index1) in item.soptions" 
+					    	border
+					    	style="">{{num[index1]}} 、 {{anser.value}}</el-radio>
+					</el-radio-group>
 		    	</div>
+		    	<div class="test-select" v-else>
+		    		<el-checkbox-group v-model="stuselect[index].select">
+					    <el-checkbox 
+					    	:label="index1" 
+					    	:key="index1" 
+					    	v-for="(anser,index1) in item.soptions" 
+					    	border
+					    	style="">{{num[index1]}} 、 {{anser.value}}</el-checkbox>
+					</el-checkbox-group> 
+		    	</div>
+<!-- 		    	<div class="test-select">
+		    		<div v-for="(anser,index1) in item.soptions" style="margin-bottom: 10px">
+		    			<el-radio v-model="radio[index]" :label="index1" border>{{anser.value}}</el-radio>
+		    		</div>
+		    	</div> -->
 		    </div>
-		    <el-button type="danger" class="submit">交卷</el-button>
+		    <el-button type="danger" class="submit" >交卷</el-button>
+		    </div>
+		    <div style="height: 500px" v-else>
+		    	<p class="tagtitle">暂无测试题！</p>
+		    </div>
 		  </el-tab-pane>
 		  <el-tab-pane name="second" class="second_content">
 		  	<span slot="label"><i class="el-icon-time"></i>试验签到</span>
@@ -31,38 +60,10 @@
 		  <el-tab-pane name="third">
 		  	<span slot="label"><i class="el-icon-tickets"></i>目的及原理</span>
 		  	<div class="third_content">
-		  		<div class="">
-		  			<div class="list">一、实验目的</div>
-		  			<div class="list_content">
-		  				<p>1.进一步熟悉Quartus II 的使用方法，掌握层次化设计方法设电路的方法。</p>
-		  				<p>2.熟悉七人表决器的工作原理。</p>
-		  			</div>
-		  		</div>
-		  		<div class="">
-		  			<div class="list">二、实验原理</div>
-		  			<div class="list_content">
-		  				<p>七人表决器就是由七个人参加投票，当同意的票数大于或者等于4时，则投票结果为同意；反之，当否决的票数大于或者等于4时，则认为不同意。</p>
-		  			</div>
-		  		</div>
-		  		<div class="">
-		  			<div class="list">三、实验内容</div>
-		  			<div class="list_content">
-		  				<p>七人表决器的可选设计方案非常多，可以使用原理图来实现，也可以使用VHDL语言选择实现，本实验要求同学们使用层次化设计方法设计七人表决器电路（低层使用VHDL语言设计、顶层使用原理图实现）。</p>
-		  			</div>
-		  		</div>
-		  		<div class="">
-		  			<div class="list">四、预习要求</div>
-		  			<div class="list_content">
-		  				<p>1.预习七人表决器的工作原理，思考用多种方法实现。</p>
-		  				<p>2.写出使用层次化设计方法设计七人表决器电路的设计方案以及实现的VHDL语言代码和原理图。</p>
-		  			</div>
-		  		</div>
-		  		<div class="">
-		  			<div class="list">五、实验步骤</div>
-		  			<div class="list_content">
-		  				<p>1.将设计的原理图或VHDL源代码输入到计算机中。</p>
-		  				<p>2.写出管脚锁定的方案</p>
-		  				<p>3.在实验仪上验证设计的结果</p>
+		  		<div class="" v-for = "(item,index) in purpose">
+		  			<div class="list">{{capital[index]}}、{{item.retitle}}</div>
+		  			<div class="list_content" v-html="item.recont">
+		  				<!-- {{item.recont}} -->
 		  			</div>
 		  		</div>
 		  	</div>
@@ -70,16 +71,16 @@
 		  <el-tab-pane name="fourth">
 		  	<span slot="label"><i class="el-icon-edit"></i>填写实验报告</span>
 		  	<div>
-			  	<div class="list">六、实验思考</div>
-			  	<div v-for="(item,index) in 5">
-			  		<p>1．请同学们思考，将表决结果中同意的人数，在二极管上显示出来，请修改你的设计。 </p>
+			  	<div class="list">{{capital[purpose.length]}}、实验思考</div>
+			  	<div v-for="(item,index) in ponder">
+			  		<p>{{index+1}}、{{item.topic}}</p>
 			  		<quill-editor ref="myTextEditor" v-model="content[index]">
 	        		</quill-editor>
 	        		<div class="btnsave"><el-button type="danger">保存</el-button></div>
 			  	</div>
 		  	</div>
 		  	<div>
-		  		<div class="list">七、实验总结</div>
+		  		<div class="list">{{capital[purpose.length+1]}}、实验总结</div>
 		  		<div>
 		  			<p>1．实验总结 （总结本次实验收获，实验中应该注意的事项） </p>
 			  		<quill-editor ref="myTextEditor">
@@ -92,13 +93,12 @@
 	</div>
 </template>
 <script>
-	import {getStuQuestion} from '@/api/api';
+	import {getStuQuestion,getExperimentContent,getExperimentConclusion} from '@/api/api';
 	export default{
 		name :"excontent",
 		data(){
 			return {
 				activeName:'first',
-				radio:[],
 				week:['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
 				timer:'',//时间函数
 				date:'',
@@ -114,6 +114,12 @@
 				singleCount:0,//单选题分数
 				multiCount:0,//多选题分数
 				questions:[],//测试题
+				stuselect:[],//学生选择
+				testLoading:false,//loding
+				purpose:[],//目的及意义
+				ponder:[],//实验思考
+				num:["A","B","C","D","E","F","G","H","I","J"],//字母
+				capital:['一','二','三','四','五','六','七','八','九','十','十一','十二','十三']
 			}
 		},
 		methods:{
@@ -126,6 +132,10 @@
     				var arr=this.calculateDiffTime(this.startstamp,this.timestamp);
     				this.usetime = this.zeroPadding(arr[0], 2) + ':' + this.zeroPadding(arr[1], 2) + ':' + this.zeroPadding(arr[2], 2);
     			}
+			},
+			handleCheckedCitiesChange(value){
+				console.log(value);
+				console.log(this.stuselect);
 			},
 			zeroPadding(num,digit){
 				var zero = '';
@@ -187,15 +197,50 @@
 					stuid : 1,
 					exid : this.$route.params.id
 				}
+				this.testLoading = true;
 				getStuQuestion(param).then(res => {
-					console.log(res.data.data);
+					// console.log(res.data.data);
+					this.testLoading = false;
+					if(res.data.code == 200){
+						this.singleCount = res.data.data.singleCount;
+						this.multiCount = res.data.data.multiCount;
+						this.questions = res.data.data.questions;
+						// console.log(res.data.data.questions);
+						for(var i = 0; i<this.questions.length;i++){
+							this.stuselect.push({
+								select:[],
+							})
+						}
+					}
 				});
+			},
+			getExperimentS(){
+				let param ={
+					id:this.$route.params.id
+				}
+				getExperimentContent(param).then(res => {
+					// console.log(res.data.data);
+					this.purpose = res.data.data;
+				});
+
+			},
+			getExperimentsConclusion(){
+				let param = {
+					exid:this.$route.params.id
+				}
+				getExperimentConclusion(param).then(res => {
+					console.log(res.data.data);
+					this.ponder = res.data.data;
+				})
+
 			}
 		},
 		mounted(){
 			this.timer=setInterval(this.updateTime,1000);
 			this.updateTime();
 			this.getTestQuesetion();
+			this.getExperimentS();
+			this.getExperimentsConclusion();
 		}
 	}
 </script>
@@ -269,9 +314,17 @@
 		text-align: right;
 		margin-top: 10px;
 	}
+	.tagtitle{
+		width: 150px;
+		line-height: 50px;
+		font-size: 20px;
+		color: red;
+		margin: 0 auto;
+		padding-top: 200px;
+	}
 </style>
 <style type="text/css">
-	.el-radio.is-bordered{
+	.el-radio.is-bordered {
 		width: 100%;
 	}
 	.el-radio+.el-radio{
@@ -284,4 +337,15 @@
 	.ql-container{
 		height: 300px;
 	}
+	.el-radio-group{
+		width: 70%;
+	}
+	.el-checkbox.is-bordered{
+		width: 70%;
+	}
+	.el-checkbox.is-bordered+.el-checkbox.is-bordered{
+		margin-left: 0px;
+		margin-top: 20px;
+	}
+
 </style>
