@@ -12,8 +12,16 @@
 			 	<li><a href="">首页</a><span>|</span></li>
 			 	<li><a href="">在线教育</a><span>|</span></li>
 			 	<li><a href="">帮助文档</a><span>|</span></li>
-			 	<li><router-link to="/login">登录
-			 	<img class="img-circle userImg" src="@/assets/touxiang.svg" style="height: 30px;"></router-link></li>
+			 	<li v-if="user.id == ''">
+            <router-link to="/login">登录
+			 	    <img class="img-circle userImg" src="@/assets/touxiang.svg" style="height: 30px;"></router-link>
+        </li>
+        <li v-else>
+            <a href="">
+              {{user.name}}
+              <img class="img-circle userImg" src="@/assets/touxiang.svg" style="height: 30px;">
+            </a>
+        </li>
 			 </ul>
 		  </el-col>
 		</el-row>
@@ -22,7 +30,22 @@
 
 <script type="text/javascript">
 	export default {
-		name:"exheader"
+		name:"exheader",
+    data(){
+      return {
+        user:{
+          id:''
+        },//用户信息
+      }
+    },
+    mounted() {
+      var user = sessionStorage.getItem('user');
+      if (user) {
+        this.user = JSON.parse(user);
+        console.log(this.user);
+      }
+
+    }
 	}
 </script>
 <style scoped>

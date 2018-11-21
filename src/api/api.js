@@ -80,3 +80,16 @@ export const getExperimentConclusion = params => {
         }
     ); 
 };
+
+//交卷
+export const submitFinish = params => { 
+    return axios.post(
+        `${base}/StuQues/submit`,
+        Qs.stringify(params),
+        {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ); 
+};

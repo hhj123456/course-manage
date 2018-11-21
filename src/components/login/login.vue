@@ -5,7 +5,7 @@
 			  <el-col :span="6" :offset="2">
 			  		<div class="head_png">
 				  	  <img src="@/assets/logo-red.svg">
-				  	 	<span  class="head_title">统一身份认证登录</span>
+				  	 	<span  class="head_title">统一身份认证</span>
 			  	 	</div>
 			  </el-col>
 			  <el-col :span="8" :offset="8">
@@ -35,6 +35,12 @@
 						</el-form-item>
 					</el-form>
 	  			</div>
+         <!--  <div>
+              <p style="margin: 100px auto;width: 190px;color: #67C23A;font-size: 25px;">
+                <i class="el-icon-success"></i>
+                密码重置成功
+              </p>
+          </div> -->
 	  		</div>
 	  	</el-main>
 	    <exfooter></exfooter>
@@ -74,6 +80,14 @@
                     message: ret.data.msg,
                     type: 'success'
                   });
+                  // console.log(ret.data.data);
+                  let user = {
+                      id:ret.data.data.id,
+                      class:ret.data.data.class,
+                      num:ret.data.data.num,
+                      name:ret.data.data.name
+                  }
+                  sessionStorage.setItem('user', JSON.stringify(user));
                   this.$router.push({
                     path:'/home'
                   })
