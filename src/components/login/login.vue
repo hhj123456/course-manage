@@ -41,6 +41,12 @@
                 密码重置成功
               </p>
           </div> -->
+         <!--  <div class="jumbotron">
+            <i class="el-icon-warning"></i>
+            <p class="jumbotronp">温馨提示：</p>
+            <p class="jumbotronp">请先登录以获取你的考试信息</p>
+            <el-button type="primary" class="jumbotronpbtn">登录</el-button>
+          </div> -->
 	  		</div>
 	  	</el-main>
 	    <exfooter></exfooter>
@@ -190,5 +196,29 @@
   .login_form{
   	width:250px;
   	padding: 40px 20px;
+  }
+  .jumbotron{
+    height: 400px;
+    margin: 0 auto;
+    background-color: #eee;
+    border-radius: 6px;
+  }
+  .el-icon-warning{
+    font-size: 60px;
+    width: 100%;
+    text-align: center;
+    margin-top: 100px;
+  }
+  .jumbotronp{
+    margin-bottom: 15px;
+    font-size: 21px;
+    font-weight: 200;
+    text-align: center;
+  }
+  .jumbotronpbtn{
+    margin-top: 10px;
+    margin-left: 40%;
+    width: 200px;
+    height: 50px;
   }
 </style>

@@ -2,6 +2,7 @@ import axios from 'axios';
 const Qs = require('qs');
 
 let base = 'api';
+// let base ='http://111.230.237.84/exserver/index.php?';
 export let baseImge = "http://111.230.237.84/exserver/";//图片读取地址
 //登录接口
 export const requestLogin = params => { 
@@ -85,6 +86,32 @@ export const getExperimentConclusion = params => {
 export const submitFinish = params => { 
     return axios.post(
         `${base}/StuQues/submit`,
+        Qs.stringify(params),
+        {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ); 
+};
+
+//签到
+export const Signin = params => { 
+    return axios.post(
+        `${base}/kaoqin/index`,
+        Qs.stringify(params),
+        {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ); 
+};
+
+//开始签到
+export const SigninStart = params => { 
+    return axios.post(
+        `${base}/kaoqin/Getstime`,
         Qs.stringify(params),
         {
             headers: {

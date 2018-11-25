@@ -20,6 +20,15 @@ router.beforeEach( (to, from, next) => {
   if(to.meta.title) {
       document.title = to.meta.title;
   }
-  next()
+  if (to.path == '/login') {
+    sessionStorage.removeItem('user');
+  }
+  let user = JSON.parse(sessionStorage.getItem('user'));
+  console.log(to.path);
+  if (!user && to.path.indexOf("course") != -1) {
+    next({ path: '/login' })
+  } else {
+    next()
+  }
 })
 export default router

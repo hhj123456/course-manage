@@ -6,7 +6,7 @@
 					{{ item.name }}
 				</el-breadcrumb-item>
 			</el-breadcrumb>
-			<h3>计算机维修技术</h3>
+			<h3>{{course.coname}}</h3>
 			<div class="course-tag">
 				<a href="">开始实验 | 尚未完结</a>
 				<div class="course-tag-flag"></div>
@@ -27,10 +27,10 @@
 		<div class="coures-content">
 			<el-tabs v-model="activeName" @tab-click="handleClick">
 			    <el-tab-pane label="课程介绍" name="first">
-			    	<p class="describe">计算机维护（修）技术是计算机科学与技术专业一门专业选修课程，也可作为非计算机专业的选修课。课程的主要内容是从计算机维护角度介绍计算机的结构，微型计算机主要部件的工作原理及性能参数，计算机的组装与BIOS的设置、维护， 系统性能测试、windows的系统维护方法以及系统维护软件的使用，微型计算机的故障维护、注册表的知识及其在计算机维护中的作用、策略编辑器的知识及其在计算机维护中的应用、计算机病毒和流氓软件的概念、预防和清除方法等。计算机维护（修）技术课程是一门实践性、技术性很强的课程，学习时要求大家理论联系实际，通过学习本课程，能掌握现代计算机组成结构与内部部件的连接，熟练掌握微机的装机过程与常用软件的安装调试，并能理论联系实践，在掌握微机维修维护方法的基础上，判断和处理常见的故障。</p>
+			    	<p class="describe">{{course.cinfo}}</p>
 			    	<p class="teacher">实验老师信息</p>
-			    	<p>马汉达</p>
-			    	<p>江苏大学 计算机学院</p>
+			    	<p>{{course.tname}}</p>
+			    	<p>江苏大学 {{course.tcollege}}</p>
 			    </el-tab-pane>
 			    <el-tab-pane label="实验章节" name="second">
 			    	<div class="excontent" v-for="(item,index) in data">
@@ -47,14 +47,14 @@
 					    	<div v-show="!expandindex[index]">
 						    	<div v-for="(item1,index1) in item.experimentinfo">
 						    		<div style="height: 5px"></div>
-						    		<router-link :to="/course/+item1.id">
+						    		<a href="javascript:;" @click="rouerto(item1.id,item1.isclass)">
 						    		<div class="exsection">
 							    		<span class="exsection_left">{{index+1}}.{{index1+1}}  {{item1.ename}}</span>
 							    		<span class="exsection_right" :class="item1.isclass == 0 ? info : danger ">
 							    			{{item1.isclass == 0 ? '未开始':'已开始'}}
 							    		</span>
 						    		</div>
-						    		</router-link>
+						    		</a>
 						    		<div style="height: 5px"></div>
 						    	</div>
 					    	</div>
@@ -72,11 +72,12 @@
 		name : 'exdetial',
 		data(){
 			return {
-				activeName:'second',
+				activeName:'first',
 				expandindex:[],
 				data:[],
 				danger:'danger',
-				info:'info'
+				info:'info',
+				course:{},//课程
 			}
 		},
 		methods:{
@@ -92,10 +93,24 @@
 		    		coid : this.$route.params.num
 		    	}
 		    	getChpaterExcement(params).then(res => {
-		    		// console.log(res.data.data);
+		    		// console.log(res.data.course);
+		    		this.course= res.data.course;
 		    		this.data = res.data.data;
 		    	});
 		    	// console.log(this.$route.params.num);
+		    },
+		    //跳转
+		    rouerto(id,isclass){
+		    	if(isclass == 0){
+		    		this.$message.error('此实验室尚未开启，请耐心等待！');
+		    	}else{
+		    		this.$router.push({
+			            name:'开始试验',
+			            params:{
+			              id:id
+			            }
+			        }); 
+		    	}
 		    }
 		},
 		mounted(){

@@ -54,7 +54,7 @@
 		    		</div>
 		    	</div> -->
 		    </div>
-		    <el-button type="danger" class="submit" @click="complete">交卷</el-button>
+		    <el-button type="danger" class="submit" @click="complete" v-show="isFinishtest == 0">交卷</el-button>
 		    </div>
 		    <div style="height: 500px" v-else>
 		    	<p class="tagtitle">暂无测试题！</p>
@@ -113,15 +113,29 @@
 		  	</div>
 		  </el-tab-pane>
 		</el-tabs>
+		<el-dialog
+	  title="通知"
+	  :visible.sync="centerDialogVisible"
+	  width="30%"
+	  center>
+	  	<p v-if="isPass==1" class="dialogp" style="color: #67C23A"><i class="el-icon-success"></i> 恭喜你，通过测试</p>
+	  	<p v-else class="dialogp" style="color: #F56C6C"><i class="el-icon-error"></i> 尚未通过测试，请联系老师！</p>
+	 	<p class="dialogp"><span>本次试卷分数：<span style="color: #ff6547">{{Allscore}}</span></span> , <span>及格分数线：<span style="color: #ff6547">{{isPassScore}}</span></span></p>
+	  	<p class="dialogp"><span>你的分数：<span style="color: #ff6547">{{stuscore}}</span></span></p>
+	  <span slot="footer" class="dialog-footer">
+	    <el-button @click="centerDialogVisible = false">取 消</el-button>
+	    <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>
+	  </span>
+	</el-dialog>
 	</div>
 </template>
 <script>
-	import {getStuQuestion,getExperimentContent,getExperimentConclusion,submitFinish} from '@/api/api';
+	import {getStuQuestion,getExperimentContent,getExperimentConclusion,submitFinish,Signin,SigninStart} from '@/api/api';
 	export default{
 		name :"excontent",
 		data(){
 			return {
-				activeName:'first',
+				activeName:'second',
 				week:['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
 				timer:'',//时间函数
 				date:'',
@@ -143,11 +157,16 @@
 				ponder:[],//实验思考
 				user:{},//用户信息
 				summary:'',//实验总结
-				isFinishtest:false,//判断是否交卷
+				isFinishtest:0,//判断是否交卷
 				activeClass:'flagBlue',//正确
 				errorClass:'flagRed',//错误
 				activeBorder:'BorderBlue',//正确
 				errorBorder:'BorderRed',//错误
+				centerDialogVisible:false,
+				stuscore:0,//分数
+				Allscore:0,//总分
+				isPassScore:0,//是否通过的分数
+				isPass:0,//是否通过
 				num:["A","B","C","D","E","F","G","H","I","J"],//字母
 				capital:['一','二','三','四','五','六','七','八','九','十','十一','十二','十三']
 			}
@@ -174,11 +193,22 @@
 			    }
 			    return (zero + num).slice(-digit);
 			},
+			//签到
 			start(){
 				if(this.starttime==''){
 					this.starttime = this.time;
 					this.startstamp =this.timestamp;
 					// console.log(this.startstamp);
+					let param = {
+						stuid:this.user.id,
+						exid:this.$route.params.id,
+						startstamp:this.startstamp
+					}
+					SigninStart(param).then(res =>{
+						console.log(res.data);
+					}).catch(ret => {
+						this.$message.error("网络连接失败！请检查");
+					})
 				}else{
 					this.$message({
 			           message: '警告哦，您已经签到过了！',
@@ -236,6 +266,7 @@
 						this.singleCount = res.data.data.singleCount;
 						this.multiCount = res.data.data.multiCount;
 						this.questions = res.data.data.questions;
+						var qstu = Object.assign([],res.data.data.qstu);
 						for(var i = 0; i<this.questions.length;i++){
 							this.stuselect.push({
 								exid:this.questions[i].exid,
@@ -253,7 +284,23 @@
 								}
 							}
 						}
-						console.log(this.questions);
+						// console.log(res.data.data);
+						var stuselect = [];
+						var qtrue = [];
+						if(qstu.length>0){
+							this.isFinishtest = Number(qstu[0].isfinishtest);
+							if(this.isFinishtest == 1){
+								stuselect = qstu[0].answer.split(";");
+								qtrue = qstu[0].qtrue.split(",").map(Number);
+							}
+							for(var i = 0;i<stuselect.length;i++){
+								stuselect[i] = stuselect[i].split(",").map(Number);
+							}
+							for(var i = 0; i< this.questions.length;i++){
+								this.questions[i].isture = qtrue[i];
+								this.questions[i].stuselect = stuselect[i];
+							}
+						}
 					}
 				});
 			},
@@ -281,10 +328,14 @@
 			complete(){
 				let falg = false;
 				let score = 0;
+				let Allscore = 0;
 				for(var i = 0 ;i<this.stuselect.length;i++){
 					if(this.stuselect[i].select.length==0){
 						falg = true;
 					}
+				}
+				if(this.isFinishtest == 1){
+					return false;
 				}
 				if(falg){
 					this.$message.error('请先完成题目！');
@@ -303,6 +354,7 @@
 							var arr = [];
 							arr.push(this.stuselect[i].select);
 							this.questions[i].stuselect = arr;
+							Allscore+=Number(this.singleCount);
 						}else{
 							var stuanswer = this.stuselect[i].select.sort().toString();
 							var correctanswer = solution.sort().toString();
@@ -313,11 +365,46 @@
 								this.questions[i].isture = 0;
 							}
 							this.questions[i].stuselect = this.stuselect[i].select.sort();
+							Allscore+=Number(this.multiCount);
 						}
 					}
-					this.isFinishtest = true;
-					console.log(score);
-					console.log(this.questions);
+					this.isFinishtest = 1;
+					this.stuscore = score;
+					this.Allscore = Allscore;
+					this.isPassScore = Number(Allscore * 0.6);
+					if(this.isPassScore < this.stuscore){
+						this.isPass = 1;
+					}else{
+						this.isPass = 0;
+					}
+					// this.centerDialogVisible = true;
+					// console.log(Allscore);
+					// console.log(this.questions);
+					let isture=[];//是否正确
+					let stuselect = [];//学生回答问题
+					for(var j=0;j<this.questions.length;j++){
+						isture[j] = this.questions[j].isture;
+						stuselect[j] = this.questions[j].stuselect.join(',');
+					}
+					let param={
+						stuid:this.user.id,
+						exid:this.$route.params.id,
+						qtrue:isture.join(","),
+						answer:stuselect.join(";"),
+						score:score,
+						allscore:Allscore,
+						isfinishtest:1,
+						flag:this.isPass,
+					}
+					submitFinish(param).then(res => {
+						if(res.data.code == 200){
+							this.centerDialogVisible = true;
+						}else{
+							 this.$message.error(res.data.msg);
+						}
+					}).catch(ret => {
+						 this.$message.error("网络连接失败！请检查");
+					})
 				}
 			},
 			//主观题交卷
@@ -329,6 +416,10 @@
 					param.content = this.content[index];
 					param.stuid = this.user.id;
 					console.log(param);
+					this.$message({
+			          message: '保存成功',
+			          type: 'success'
+			        });
 				}
 
 			},
@@ -344,7 +435,21 @@
 					param.stuid = this.user.id;
 					console.log(param);
 				}
-			}
+			},
+			SearchSign(){
+				let param = {
+					stuid:this.user.id,
+					exid:this.$route.params.id
+				}
+				Signin(param).then(res =>{
+					let cd = new Date(Number(res.data.data[0].stime));
+					this.startstamp = res.data.data[0].stime;
+					this.starttime = this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+
+				}).catch(ret => {
+					this.$message.error("网络连接失败！请检查");
+				})
+			},
 		},
 		mounted(){
 			this.timer=setInterval(this.updateTime,1000);
@@ -356,6 +461,7 @@
 			this.getTestQuesetion();
 			this.getExperimentS();
 			this.getExperimentsConclusion();
+			this.SearchSign();
 		}
 	}
 </script>
@@ -469,6 +575,10 @@
 	}
 	.BorderRed{
 		border-color: #ff6547!important;
+	}
+	.dialogp{
+		text-align: center;
+		font-size: 15px;
 	}
 </style>
 <style type="text/css">
