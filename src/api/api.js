@@ -120,3 +120,42 @@ export const SigninStart = params => {
         }
     ); 
 };
+
+//签退
+export const SigninOut = params => { 
+    return axios.post(
+        `${base}/kaoqin/Getetime`,
+        Qs.stringify(params),
+        {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ); 
+};
+
+//提交实验报告
+export const submitExreport = params => { 
+    return axios.post(
+        `${base}/Exreport/index`,
+        Qs.stringify(params),
+        {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ); 
+};
+
+//获取学生提交的
+export const getStuExreport = params => { 
+    return axios.post(
+        `${base}/Exreport/select`,
+        Qs.stringify(params),
+        {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ); 
+};

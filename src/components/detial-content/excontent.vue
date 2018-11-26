@@ -130,12 +130,12 @@
 	</div>
 </template>
 <script>
-	import {getStuQuestion,getExperimentContent,getExperimentConclusion,submitFinish,Signin,SigninStart} from '@/api/api';
+	import {getStuQuestion,getExperimentContent,getExperimentConclusion,submitFinish,Signin,SigninStart,SigninOut,submitExreport,getStuExreport} from '@/api/api';
 	export default{
 		name :"excontent",
 		data(){
 			return {
-				activeName:'second',
+				activeName:'first',
 				week:['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
 				timer:'',//时间函数
 				date:'',
@@ -175,7 +175,7 @@
 			updateTime(){
 				var cd = new Date();
 				this.timestamp = Date.parse(cd);
-				this.time = this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+				this.time = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()]+ ' '+this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
     			this.date = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()];
     			if(this.startstamp!='' && !this.stopflag){
     				var arr=this.calculateDiffTime(this.startstamp,this.timestamp);
@@ -204,9 +204,20 @@
 						exid:this.$route.params.id,
 						startstamp:this.startstamp
 					}
+					this.testLoading = true;
 					SigninStart(param).then(res =>{
-						console.log(res.data);
+						this.testLoading = false;
+						if(res.data.code == 200){
+							this.$message({
+					          message: res.data.msg,
+					          type: 'success'
+					        });
+						}else{
+							this.$message.error(res.data.msg);
+						}
+						// console.log(res.data);
 					}).catch(ret => {
+						this.testLoading = false;
 						this.$message.error("网络连接失败！请检查");
 					})
 				}else{
@@ -216,12 +227,31 @@
 			        });
 				}
 			},
+			//签退
 			stop(){
 				if(this.starttime!=''){
 					if(this.endtime ==''){
-						this.endtime = this.time;
-						this.endstamp = this.timestamp;
-						this.stopflag=true;
+						let param = {
+							stuid:this.user.id,//学生id
+							exid:this.$route.params.id,//实验ID
+							endstamp:this.timestamp,//结束时间戳
+						}
+						SigninOut(param).then(res => {
+							// console.log(res.data.data);
+							if(res.data.code == 200){
+								this.$message({
+						          message: res.data.msg,
+						          type: 'success'
+						        });
+						        this.endtime = this.time;
+								this.endstamp = this.timestamp;
+								this.stopflag=true;
+							}else{
+								this.$message.error(res.data.msg);
+							}
+						}).catch(ret => {
+							this.$message.error("网络连接失败！请检查");
+						});
 					}else{
 						this.$message({
 				           message: '警告！已经签退过了，如果是误点，请联系老师',
@@ -320,8 +350,27 @@
 					exid:this.$route.params.id
 				}
 				getExperimentConclusion(param).then(res => {
-					// console.log(res.data.data);
 					this.ponder = res.data.data;
+					let param = {
+						stuid:this.user.id,
+						exid:this.$route.params.id
+					}
+					getStuExreport(param).then(res1 => {
+						// console.log(res1.data.data);
+						// console.log(this.ponder);
+						let content = Object.assign([],res1.data.data);
+						// console.log(content);
+						for(var i = 0 ;i<this.ponder.length;i++){
+							for(var j = 0 ;j < content.length ; j++){
+								if(this.ponder[i].id == content[j].titleid){
+									this.content[i] = content[j].content;
+								}
+							}
+						}
+						console.log(this.content);
+					}).catch(ret =>{
+						this.$message.error("网络连接失败！请检查");
+					})
 				})
 			},
 			//预测题交卷
@@ -415,11 +464,21 @@
 					let param =Object.assign({},this.ponder[index]);
 					param.content = this.content[index];
 					param.stuid = this.user.id;
-					console.log(param);
-					this.$message({
-			          message: '保存成功',
-			          type: 'success'
-			        });
+					this.testLoading = true;
+					submitExreport(param).then(res =>{
+						this.testLoading = false ;
+						if(res.data.code == 200){
+							this.$message({
+					          message: res.data.msg,
+					          type: 'success'
+					        });
+						}else{
+							 this.$message.error(res.data.msg);
+						}
+					}).catch(ret => {
+						this.testLoading = false ;
+						this.$message.error("网络连接失败！请检查");
+					});
 				}
 
 			},
@@ -442,9 +501,20 @@
 					exid:this.$route.params.id
 				}
 				Signin(param).then(res =>{
-					let cd = new Date(Number(res.data.data[0].stime));
-					this.startstamp = res.data.data[0].stime;
-					this.starttime = this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+					// console.log(res.data.data);
+					if(res.data.data.length>0 && res.data.data[0].stime != null){
+						let cd = new Date(Number(res.data.data[0].stime));
+						this.startstamp = res.data.data[0].stime;
+						this.starttime = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()]+ ' '+this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+					}
+					if(res.data.data.length>0 && res.data.data[0].etime != null){
+						let cd = new Date(Number(res.data.data[0].etime));
+						this.endstamp = res.data.data[0].etime;
+						this.endtime = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()]+ ' '+this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+						this.stopflag=true;
+						var arr=this.calculateDiffTime(this.startstamp,this.endstamp);
+	    				this.usetime = this.zeroPadding(arr[0], 2) + ':' + this.zeroPadding(arr[1], 2) + ':' + this.zeroPadding(arr[2], 2);
+						}
 
 				}).catch(ret => {
 					this.$message.error("网络连接失败！请检查");
