@@ -1,13 +1,13 @@
 <template>
 	<el-header style="height: 70px">
   		<el-row :gutter="20">
-		  <el-col :span="6" :offset="2">
+		  <el-col :span="11" :offset="2">
 		  		<div class="head_png">
 			  	  	<img src="@/assets/logo-red.svg">
-			  	 	<span  class="head_title">实验过程管理系统</span>
+			  	 	<span  class="head_title">基于Ci+Vue的教学实验过程管理系统</span>
 		  	 	</div>
 		  </el-col>
-		  <el-col :span="11" :offset="5">
+		  <el-col :span="11">
 			 <ul class="head_meun">
 			 	<li><a href="">首页</a><span>|</span></li>
 			 	<li><a href="">在线教育</a><span>|</span></li>
