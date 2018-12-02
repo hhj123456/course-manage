@@ -175,7 +175,7 @@
 			updateTime(){
 				var cd = new Date();
 				this.timestamp = Date.parse(cd);
-				this.time = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()]+ ' '+this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+				this.time = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
     			this.date = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()];
     			if(this.startstamp!='' && !this.stopflag){
     				var arr=this.calculateDiffTime(this.startstamp,this.timestamp);
@@ -196,8 +196,6 @@
 			//签到
 			start(){
 				if(this.starttime==''){
-					this.starttime = this.time;
-					this.startstamp =this.timestamp;
 					// console.log(this.startstamp);
 					let param = {
 						stuid:this.user.id,
@@ -212,6 +210,8 @@
 					          message: res.data.msg,
 					          type: 'success'
 					        });
+					       	this.starttime = this.time;
+							this.startstamp =this.timestamp;
 						}else{
 							this.$message.error(res.data.msg);
 						}
@@ -367,7 +367,7 @@
 								}
 							}
 						}
-						console.log(this.content);
+						// console.log(this.content);
 					}).catch(ret =>{
 						this.$message.error("网络连接失败！请检查");
 					})
@@ -503,16 +503,23 @@
 				Signin(param).then(res =>{
 					// console.log(res.data.data);
 					if(res.data.data.length>0 && res.data.data[0].stime != null){
-						let cd = new Date(Number(res.data.data[0].stime));
-						this.startstamp = res.data.data[0].stime;
-						this.starttime = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()]+ ' '+this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+						// let cd = new Date(Number(res.data.data[0].stime));
+						// this.startstamp = res.data.data[0].stime;
+						// this.starttime = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()]+ ' '+this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+						this.starttime =  res.data.data[0].stime1;
+						this.startstamp = res.data.data[0].stime * 1000;
 					}
 					if(res.data.data.length>0 && res.data.data[0].etime != null){
-						let cd = new Date(Number(res.data.data[0].etime));
-						this.endstamp = res.data.data[0].etime;
-						this.endtime = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()]+ ' '+this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
-						this.stopflag=true;
-						var arr=this.calculateDiffTime(this.startstamp,this.endstamp);
+						// let cd = new Date(Number(res.data.data[0].etime));
+						// this.endstamp = res.data.data[0].etime;
+						// this.endtime = this.zeroPadding(cd.getFullYear(), 4) + '-' + this.zeroPadding(cd.getMonth()+1, 2) + '-' + this.zeroPadding(cd.getDate(), 2) + ' '+this.week[cd.getDay()]+ ' '+this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+						// this.stopflag=true;
+						// var arr=this.calculateDiffTime(this.startstamp,this.endstamp);
+	    	// 			this.usetime = this.zeroPadding(arr[0], 2) + ':' + this.zeroPadding(arr[1], 2) + ':' + this.zeroPadding(arr[2], 2);
+	    				this.endtime =  res.data.data[0].etime1;
+	    				this.endstamp = res.data.data[0].etime * 1000;
+	    				this.stopflag=true;
+	    				var arr=this.calculateDiffTime(this.startstamp,this.endstamp);
 	    				this.usetime = this.zeroPadding(arr[0], 2) + ':' + this.zeroPadding(arr[1], 2) + ':' + this.zeroPadding(arr[2], 2);
 						}
 
