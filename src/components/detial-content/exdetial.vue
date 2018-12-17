@@ -8,11 +8,11 @@
 			</el-breadcrumb>
 			<h3>{{course.coname}}</h3>
 			<div class="course-tag">
-				<a href="">开始实验 | 尚未完结</a>
+				<a href="javascript:;">开始实验 | 尚未完结</a>
 				<div class="course-tag-flag"></div>
 				<span>
 					<p>实验人数</p>
-					<p>67人</p>
+					<p>暂无</p>
 				</span>
 				<span>
 					<p>实验难度</p>
@@ -20,7 +20,7 @@
 				</span>
 				<span>
 					<p>实验时长</p>
-					<p>8周</p>
+					<p>课表</p>
 				</span>
 			</div>
 		</div>
@@ -47,7 +47,7 @@
 					    	<div v-show="!expandindex[index]">
 						    	<div v-for="(item1,index1) in item.experimentinfo">
 						    		<div style="height: 5px"></div>
-						    		<a href="javascript:;" @click="rouerto(item1.id,item1.isclass)">
+						    		<a href="javascript:;" @click="rouerto(item1.id,item1.isclass,item1)">
 						    		<div class="exsection">
 							    		<span class="exsection_left">{{index+1}}.{{index1+1}}  {{item1.ename}}</span>
 							    		<span class="exsection_right" :class="item1.isclass == 0 ? info : danger ">
@@ -61,13 +61,51 @@
 				    	</el-collapse-transition>
 			    	</div>
 			    </el-tab-pane>
-			    <el-tab-pane label="评论" name="third">评论</el-tab-pane>
+			    <el-tab-pane label="已签到" name="third">
+			    	<el-table :data="exprementInfo" highlight-current-row style="width: 100%;">
+						<el-table-column type="index" width="50">
+						</el-table-column>
+						<el-table-column prop="ename" label="实验名称" width="180" show-overflow-tooltip align="center"></el-table-column>
+						<el-table-column prop="stime" label="签到时间" width="180" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column prop="etime" label="签退时间"  width="180" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column prop="duration" label="实验时长" width="120" show-overflow-tooltip sortable align="center">
+						</el-table-column>
+						<el-table-column prop="score" label="实验预习" width="120" show-overflow-tooltip  align="center" sortable>
+							<template slot-scope="scope">
+								{{scope.row.score}}
+							</template>
+						</el-table-column>
+						<el-table-column prop="score" label="实验操作" width="130" show-overflow-tooltip  align="center" sortable>
+							<template slot-scope="scope">
+								{{scope.row.operationscore}}
+							</template>
+						</el-table-column>
+						<el-table-column prop="score" label="实验报告" width="130" show-overflow-tooltip  align="center" sortable>
+							<template slot-scope="scope">
+								{{scope.row.reportscore}}
+							</template>
+						</el-table-column>
+						<el-table-column prop="score" label="总分" width="110" show-overflow-tooltip  align="center" sortable>
+							<template slot-scope="scope">
+								{{scope.row.rationscore}}
+							</template>
+						</el-table-column>
+						<!-- <el-table-column label="操作" width="150">
+							 <template slot-scope="scope">
+								<el-button size="small" @click="handleExprement(scope.$index, scope.row)">编辑</el-button>
+								<el-button type="danger" size="small" @click="handleEdit(scope.$index, scope.row)">查看</el-button>
+							</template>
+						</el-table-column> -->
+					</el-table>
+			    </el-tab-pane>
 			</el-tabs>
 		</div>
 	</div>
 </template>
 <script>
-	import {getChpaterExcement} from '@/api/api';
+	import {getChpaterExcement,getStuRecord} from '@/api/api';
 	export default{
 		name : 'exdetial',
 		data(){
@@ -78,11 +116,13 @@
 				danger:'danger',
 				info:'info',
 				course:{},//课程
+				user:{},//用户信息
+				exprementInfo:[],//实验信息
 			}
 		},
 		methods:{
 			handleClick(tab, event) {
-		        console.log(tab, event);
+		        // console.log(tab, event);
 		    },
 		    expand(index){
 		    	this.expandindex[index] = !this.expandindex[index];
@@ -90,7 +130,8 @@
 		    },
 		    getChapers(){
 		    	let params ={
-		    		coid : this.$route.params.num
+		    		coid : this.$route.params.num,
+		    		class : this.user.class
 		    	}
 		    	getChpaterExcement(params).then(res => {
 		    		// console.log(res.data.course);
@@ -100,10 +141,11 @@
 		    	// console.log(this.$route.params.num);
 		    },
 		    //跳转
-		    rouerto(id,isclass){
+		    rouerto(id,isclass,item){
 		    	if(isclass == 0){
 		    		this.$message.error('此实验室尚未开启，请耐心等待！');
 		    	}else{
+		    		
 		    		this.$router.push({
 			            name:'开始试验',
 			            params:{
@@ -111,10 +153,27 @@
 			            }
 			        }); 
 		    	}
+		    },
+		    getStuRecords(){
+		    	let params = {
+		    		stuid:this.user.id,
+		    		coid:this.$route.params.num
+		    	}
+		    	getStuRecord(params).then(res => {
+		    		// console.log(res.data.data);
+		    		for(let i in res.data.data){
+		    			this.exprementInfo.push(res.data.data[i]);
+		    		}
+		    	});
 		    }
 		},
 		mounted(){
-			this.getChapers();
+			var user = sessionStorage.getItem('user');
+		    if (user) {
+		        this.user = JSON.parse(user);
+		    }
+		    this.getChapers();
+		    this.getStuRecords();
 		}
 	}
 </script>

@@ -660,27 +660,27 @@
 </style>
 <style type="text/css">
 	.el-radio.is-bordered {
-		width: 100%;
+		width: 100%!important;
 	}
 	.el-radio+.el-radio{
-		margin-left: 0px;
-		margin-top: 20px;
+		margin-left: 0px!important;
+		margin-top: 20px!important;
 	}
 	.el-radio.is-bordered+.el-radio.is-bordered{
-		margin-left: 0px;
+		margin-left: 0px!important;
 	}
 	.ql-container{
-		height: 300px;
+		height: 300px!important;
 	}
 	.el-radio-group{
-		width: 70%;
+		width: 70%!important;
 	}
 	.el-checkbox.is-bordered{
-		width: 70%;
+		width: 70%!important;
 	}
 	.el-checkbox.is-bordered+.el-checkbox.is-bordered{
-		margin-left: 0px;
-		margin-top: 20px;
+		margin-left: 0px!important;
+		margin-top: 20px!important;
 	}
 	/*.el-radio.is-bordered.is-checked{
 		border-color: red;
