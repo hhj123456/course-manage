@@ -3,8 +3,8 @@
   		<el-row :gutter="20">
 		  <el-col :span="11" :offset="2">
 		  		<div class="head_png">
-			  	  	<img src="@/assets/logo-red.svg">
-			  	 	<span  class="head_title">基于Ci+Vue的教学实验过程管理系统</span>
+			  	  	<img src="@/assets/jdlogo.jpg" style="height: 50px">
+			  	 	<span  class="head_title">基于CI+Vue的实验教学过程管理系统</span>
 		  	 	</div>
 		  </el-col>
 		  <el-col :span="11">
