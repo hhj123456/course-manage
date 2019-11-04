@@ -61,7 +61,7 @@
 		    </div>
 		  </el-tab-pane>
 		  <el-tab-pane name="second" class="second_content">
-		  	<span slot="label"><i class="el-icon-time"></i>实验签到</span>
+		  	<span slot="label"><i class="el-icon-time"></i>试验签到</span>
 		  	<div class="sign">
 				<P class="date">当前日期:{{date}}</P> 
 				<P class="time">时间:{{time}}</P>  
@@ -92,7 +92,7 @@
 			  	<div class="list">{{capital[purpose.length]}}、实验思考</div>
 			  	<div v-if="ponder.length > 0">
 			  	<div v-for="(item,index) in ponder">
-			  		<p>{{index+1}}、{{item.topic}} <span>(本题满分：{{item.score}}分)</span></p>
+			  		<p>{{index+1}}、{{item.topic}}</p>
 			  		<quill-editor ref="myTextEditor" v-model="content[index]">
 	        		</quill-editor>
 	        		<div class="btnsave"><el-button type="danger" @click="saveSubjective(index)">保存</el-button></div>
@@ -101,9 +101,8 @@
 			  	<div v-else>
 			  		<p style="text-indent: 2em">暂无思考题</p>
 			  	</div>
-			  	<el-button type="success" class="submit" @click="submitSubjective">交卷</el-button>
 		  	</div>
-		  	<!-- <div>
+		  	<div>
 		  		<div class="list">{{capital[purpose.length+1]}}、实验总结</div>
 		  		<div>
 		  			<p>1．实验总结 （总结本次实验收获，实验中应该注意的事项） </p>
@@ -111,7 +110,7 @@
 	        		</quill-editor>
 	        		<div class="btnsave"><el-button type="danger" @click="saveSummary">保存</el-button></div>
 		  		</div>
-		  	</div> -->
+		  	</div>
 		  </el-tab-pane>
 		</el-tabs>
 		<el-dialog
@@ -528,10 +527,6 @@
 					this.$message.error("网络连接失败！请检查");
 				})
 			},
-			//主观题交卷
-			submitSubjective(){
-
-			}
 		},
 		mounted(){
 			this.timer=setInterval(this.updateTime,1000);
@@ -665,27 +660,27 @@
 </style>
 <style type="text/css">
 	.el-radio.is-bordered {
-		width: 100%!important;
+		width: 100%;
 	}
 	.el-radio+.el-radio{
-		margin-left: 0px!important;
-		margin-top: 20px!important;
+		margin-left: 0px;
+		margin-top: 20px;
 	}
 	.el-radio.is-bordered+.el-radio.is-bordered{
-		margin-left: 0px!important;
+		margin-left: 0px;
 	}
 	.ql-container{
-		height: 300px!important;
+		height: 300px;
 	}
 	.el-radio-group{
-		width: 70%!important;
+		width: 70%;
 	}
 	.el-checkbox.is-bordered{
-		width: 70%!important;
+		width: 70%;
 	}
 	.el-checkbox.is-bordered+.el-checkbox.is-bordered{
-		margin-left: 0px!important;
-		margin-top: 20px!important;
+		margin-left: 0px;
+		margin-top: 20px;
 	}
 	/*.el-radio.is-bordered.is-checked{
 		border-color: red;

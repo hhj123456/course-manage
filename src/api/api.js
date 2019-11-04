@@ -1,9 +1,9 @@
 import axios from 'axios';
 const Qs = require('qs');
 
-let base = 'api';//本地
-// let base ='http://47.101.167.187/exserver/index.php?';//线上
-export let baseImge = "http://47.101.167.187/exserver/";//图片读取地址
+let base = 'api';
+// let base ='http://111.230.237.84/exserver/index.php?';
+export let baseImge = "http://111.230.237.84/exserver/";//图片读取地址
 //登录接口
 export const requestLogin = params => { 
 	return axios.post(
@@ -151,32 +151,6 @@ export const submitExreport = params => {
 export const getStuExreport = params => { 
     return axios.post(
         `${base}/Exreport/select`,
-        Qs.stringify(params),
-        {
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        }
-    ); 
-};
-
-//获取学生已经签到的
-export const getStuRecord = params => { 
-    return axios.post(
-        `${base}/StuExp/index`,
-        Qs.stringify(params),
-        {
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        }
-    ); 
-};
-
-//获取学生报告
-export const getStuExreportAll = params => { 
-    return axios.post(
-        `${base}/Expinfo/index`,
         Qs.stringify(params),
         {
             headers: {
